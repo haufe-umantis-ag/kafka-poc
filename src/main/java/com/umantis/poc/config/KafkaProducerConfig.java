@@ -1,5 +1,6 @@
-package com.umantis.poc;
+package com.umantis.poc.config;
 
+import com.umantis.poc.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
