@@ -1,0 +1,42 @@
+= Haufe Kafka PoC
+
+In order to be able to execute the integration tests existing in the project, you will need to have active a real kafka and zookeeper service.
+If you don't have an already existing installation, you can use a docker instansce this way:
+
+[source,bash]
+----
+docker run -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=`docker-machine ip \`docker-machine active\`` --env ADVERTISED_PORT=9092 spotify/kafka
+----
+[%hardbreaks]
+
+If you don't have docker-machine in your system you can always:
+
+[source,bash]
+----
+docker run -d -p 2181:2181 -p 9092:9092 --env ADVERTISED_HOST=`ipconfig getifaddr en0` --env ADVERTISED_PORT=9092 spotify/kafka
+----
+[%hardbreaks]
+
+or the related windows commands....
+
+This PoC proves the usage of Kafka to solve the following requirements:
+
+=== Queues &amp; Topics:
+Messages in Kafka are categorized into Topics which are consumed as in Queues by the consumers thanks to an stored offset system. Although topics can be added manually, them can be created automatically when data is first published to a non-existent topic. So, pushing a message to a non exisiting topic, will create it.
+
+In order to check the capability of kafka to create topics "on the fly" please execute test:
+`TopicGenerationIntegrationTest`
+
+=== Exponential backoff and message retry
+The most important mechanisms in Kafka to assure message retry is the capability from a consumer to set his own "advance" on the queue is consuming. This is possible thanks an offset which determines the position of the consumer into the queue of messages of a topic, that can be manually overrided, or said into a different way, we have the possibility to rollback the offset in the client. On the other hand, a common practice is to create "hospital queues/topics" in order to re-process again a problematic message.
+In addition to the options we have to ensure the correct consumption of a message, Kafka also provides us the capability to navigate by our queue to reprocess any given message.
+So, we can rollback manually (else it will be managed by Kafka) our client offset to retry a message processing, or we can provide extra "hospital queues" to process in a second phase a corrupted or problematic message.
+
+In order to check the capability of kafka to retry message processing in case of non ftal error, please execute test:
+`ExponentialBackoffMessageRetryIntegrationTest`
+
+=== Message expiration time
+The Kafka frameworks provide an Admin utils library which we can use to create, modify or delete partitions, retrieve list of topics, add partitions to a topic or add or modify a concrete property.
+
+In order to check the capability of kafka to manage the retention time of the messages in a topic, please execute test:
+`RetentionTimeIntegrationTest`

@@ -18,13 +18,13 @@ import java.util.concurrent.TimeUnit;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class SpringKafkaApplicationTests {
+public class SpringKafkaApplicationTest {
 
     @Autowired
-    public KafkaProducer producer;
+    public Producer producer;
 
     @Autowired
-    public KafkaConsumer consumer;
+    public Consumer consumer;
 
     private static String TOPIC;
 

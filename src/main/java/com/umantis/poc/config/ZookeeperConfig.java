@@ -1,7 +1,6 @@
 package com.umantis.poc.config;
 
 import kafka.utils.ZKStringSerializer$;
-import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,10 +32,5 @@ public class ZookeeperConfig {
     public ZkClient getZookeeperClient() {
         ZkClient zkClient = new ZkClient(getZookeeperConnection(), connectionTimeout, ZKStringSerializer$.MODULE$);
         return zkClient;
-    }
-
-    @Bean
-    public ZkUtils getZkUtils() {
-        return new ZkUtils(getZookeeperClient(), getZookeeperConnection(), true);
     }
 }

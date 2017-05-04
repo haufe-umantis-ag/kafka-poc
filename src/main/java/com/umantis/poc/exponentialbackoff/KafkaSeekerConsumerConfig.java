@@ -1,58 +1,60 @@
-package com.umantis.poc.config;
+package com.umantis.poc.exponentialbackoff;
 
-import com.umantis.poc.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Basic Kafka Configuration for consumer
+ * Kafka Producer Configuration with special setup for exponential backoff message retry consumer.
+ * Autocommit is disabled in order to leave the commit responsibility to the consumer.
  *
  * @author David Espinosa.
  */
-//@EnableKafka
 @Configuration
-public class KafkaConsumerConfig {
+public class KafkaSeekerConsumerConfig {
 
     @Value("${kafka.servers}")
     private String servers;
 
-    @Value("${consumer.grouip}")
+    @Value("${seeker_consumer.grouip}")
     private String groupId;
 
-    @Bean
+    @Bean(name = "seekerConsumerConfig")
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
 
         return props;
     }
 
-    @Bean(name = "consumerFactory")
-    public ConsumerFactory<String, String> consumerFactory() {
+    @Bean(name = "seekerFactoryConfig")
+    public ConsumerFactory<String, String> seekerFactoryConfig() {
         return new DefaultKafkaConsumerFactory<String, String>(consumerConfigs());
     }
 
-    @Bean(name = "kafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
+    @Bean(name = "seekerKafkaFactoryConfig")
+    public ConcurrentKafkaListenerContainerFactory<String, String> seekerKafkaFactoryConfig() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(seekerFactoryConfig());
+        factory.getContainerProperties().setAckMode(AbstractMessageListenerContainer.AckMode.MANUAL);
         return factory;
     }
 
-    @Bean(name = "consumer")
-    public Consumer consumer() {
-        return new Consumer();
+    @Bean
+    public SeekerConsumer seekerConsumer() {
+        return new SeekerConsumer();
     }
 }

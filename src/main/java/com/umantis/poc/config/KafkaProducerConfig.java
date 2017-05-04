@@ -1,6 +1,6 @@
 package com.umantis.poc.config;
 
-import com.umantis.poc.KafkaProducer;
+import com.umantis.poc.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Basic Kafka configuration for producer.
+ *
  * @author David Espinosa.
  */
 @Configuration
@@ -43,7 +45,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaProducer producer() {
-        return new KafkaProducer();
+    public Producer producer() {
+        return new Producer();
     }
 }

@@ -6,17 +6,19 @@ import org.springframework.kafka.annotation.KafkaListener;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * Basic spring kafka consumer
+ *
  * @author David Espinosa.
  */
-public class KafkaConsumer {
+public class Consumer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Consumer.class);
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-    @KafkaListener(topics = "${kafka.topic}")
+    @KafkaListener(id = "consumer", topics = "${kafka.topic}", containerFactory = "kafkaListenerContainerFactory")
     public void receive(String message) {
-        LOGGER.info("received message='{}'", message);
+        LOGGER.info("received message= "+message);
         latch.countDown();
     }
 
