@@ -1,6 +1,11 @@
 package com.umantis.poc;
 
+import java.util.concurrent.TimeUnit;
+
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +16,8 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.test.rule.KafkaEmbedded;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.junit4.SpringRunner;
-import java.util.concurrent.TimeUnit;
+
+import com.umantis.poc.admin.KafkaAdminUtils;
 
 /**
  * @author David Espinosa.
@@ -26,34 +32,20 @@ public class SpringKafkaApplicationTest {
     @Autowired
     public Consumer consumer;
 
-    private static String TOPIC;
+    @Autowired
+    public KafkaAdminUtils kafkaAdminService;
+
+    private static String TOPIC = "kafka-poc";
 
     @Value("${kafka.topic}")
     public void setTopic(String topic) {
         TOPIC = topic;
     }
-
-    @Autowired
-    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
-
-    // uncomment if no real kafka is running
-    //    @ClassRule
-    public static KafkaEmbedded embeddedKafka = new KafkaEmbedded(1, true, TOPIC);
-
-    // uncomment if no real kafka is running
-    //    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        System.setProperty("kafka.bootstrap-servers", embeddedKafka.getBrokersAsString());
-    }
-
-    // uncomment if no real kafka is running
-    //    @Before
-    public void setUp() throws Exception {
-        // wait until the partitions are assigned
-        for (MessageListenerContainer messageListenerContainer : kafkaListenerEndpointRegistry
-                .getListenerContainers()) {
-            ContainerTestUtils.waitForAssignment(messageListenerContainer,
-                                                 embeddedKafka.getPartitionsPerTopic());
+    
+    @Before
+    public void setup() {
+        if (kafkaAdminService.topicExists(TOPIC)) {
+            TOPIC = TOPIC + System.currentTimeMillis();
         }
     }
 
