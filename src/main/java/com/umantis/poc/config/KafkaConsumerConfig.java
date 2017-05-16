@@ -10,16 +10,18 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Basic Kafka Configuration for consumer
+ * Kafka Producer Configuration with special setup for exponential backoff message retry consumer.
+ * Autocommit is disabled in order to leave the commit responsibility to the consumer.
  *
  * @author David Espinosa.
  */
-//@EnableKafka
 @Configuration
+@EnableKafka
 public class KafkaConsumerConfig {
 
     @Value("${kafka.servers}")
@@ -34,24 +36,26 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
 
         return props;
     }
 
-    @Bean(name = "consumerFactory")
-    public ConsumerFactory<String, String> consumerFactory() {
+    @Bean
+    public ConsumerFactory<String, String> factoryConfig() {
         return new DefaultKafkaConsumerFactory<String, String>(consumerConfigs());
     }
 
-    @Bean(name = "kafkaListenerContainerFactory")
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(factoryConfig());
+        factory.getContainerProperties().setAckMode(AbstractMessageListenerContainer.AckMode.MANUAL);
         return factory;
     }
 
-    @Bean(name = "consumer")
+    @Bean
     public Consumer consumer() {
         return new Consumer();
     }

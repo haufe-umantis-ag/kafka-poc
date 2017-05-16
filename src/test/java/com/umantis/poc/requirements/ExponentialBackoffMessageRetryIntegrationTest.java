@@ -2,9 +2,10 @@ package com.umantis.poc.requirements;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.umantis.poc.Consumer;
 import com.umantis.poc.Producer;
 import com.umantis.poc.admin.KafkaAdminUtils;
-import com.umantis.poc.exponentialbackoff.SeekerConsumer;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +28,20 @@ public class ExponentialBackoffMessageRetryIntegrationTest {
     public Producer producer;
 
     @Autowired
-    public SeekerConsumer seekerConsumer;
+    public Consumer consumer;
 
     private static String TOPIC;
 
     @Value("${kafka.seeker_topic}")
     public void setTopic(String topic) {
         TOPIC = topic;
+    }
+
+    @Before
+    public void setup() {
+        if (!kafkaAdminService.topicExists(TOPIC)) {
+            kafkaAdminService.createTopic(TOPIC, -1);
+        }
     }
 
     @Test()
@@ -44,12 +52,12 @@ public class ExponentialBackoffMessageRetryIntegrationTest {
         producer.send(TOPIC, "This message will NOT be correctly processed");
 
         //when
-        seekerConsumer.getIncorrectMessageLatch().await(10000, TimeUnit.MILLISECONDS);
+        consumer.getIncorrectMessageLatch().await(10000, TimeUnit.MILLISECONDS);
 
         //then
         //incorrect message has been processed 2 times
-        assertThat(seekerConsumer.getIncorrectMessageLatch().getCount()).isEqualTo(0);
+        assertThat(consumer.getIncorrectMessageLatch().getCount()).isEqualTo(0);
         //correct message has been processed 1 time
-        assertThat(seekerConsumer.getCorrectMessageLatch().getCount()).isEqualTo(0);
+        assertThat(consumer.getLatch().getCount()).isEqualTo(0);
     }
 }
