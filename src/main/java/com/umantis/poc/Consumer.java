@@ -18,7 +18,7 @@ import java.util.concurrent.CountDownLatch;
  *
  * @author David Espinosa.
  */
-public class Consumer implements AcknowledgingMessageListener<Integer, BaseMessage>, ConsumerSeekAware {
+public class Consumer implements AcknowledgingMessageListener<String, BaseMessage>, ConsumerSeekAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Consumer.class);
 
@@ -50,7 +50,7 @@ public class Consumer implements AcknowledgingMessageListener<Integer, BaseMessa
 
     @Override
     @KafkaListener(id = "seeker", topics = "${kafka.seeker_topic}")
-    public void onMessage(final ConsumerRecord<Integer, BaseMessage> consumerRecord, final Acknowledgment acknowledgment) {
+    public void onMessage(final ConsumerRecord<String, BaseMessage> consumerRecord, final Acknowledgment acknowledgment) {
 
         try {
             BaseMessage value = (BaseMessage) consumerRecord.value();

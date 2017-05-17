@@ -46,7 +46,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConsumerFactory<String, BaseMessage> factoryConfig() {
-        return new DefaultKafkaConsumerFactory<String, BaseMessage>(consumerConfigs(), null, new JsonDeserializer(BaseMessage.class));
+        return new DefaultKafkaConsumerFactory<String, BaseMessage>(consumerConfigs(), new StringDeserializer(), new JsonDeserializer(BaseMessage.class));
     }
 
     @Bean

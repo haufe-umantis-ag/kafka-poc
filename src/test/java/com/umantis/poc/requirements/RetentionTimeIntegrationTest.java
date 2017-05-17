@@ -58,7 +58,14 @@ public class RetentionTimeIntegrationTest {
     public void given_topicWithNoDataRetentionTimeSet_when_settingNewTime_then_theChangeRemains() {
 
         //given
-        producer.send(NEW_TOPIC, new BaseMessage(NEW_TOPIC , "Topic " + NEW_TOPIC +" is created", "RetentionTimeIntegrationTest"));
+        BaseMessage message = BaseMessage.builder()
+                .topic(NEW_TOPIC)
+                .message("New topic " + NEW_TOPIC + " is created")
+                .origin("RetentionTimeIntegrationTest")
+                .customerId("0")
+                .build();
+        producer.send(NEW_TOPIC,message);
+
         long topicRetentionTime = kafkaAdminService.getTopicRetentionTime(NEW_TOPIC);
         assertEquals(topicRetentionTime, -1);
 

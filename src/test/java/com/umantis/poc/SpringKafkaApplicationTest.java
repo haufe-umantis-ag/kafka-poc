@@ -44,7 +44,14 @@ public class SpringKafkaApplicationTest {
 
     @Test
     public void testReceive() throws Exception {
-        producer.send(TOPIC, new BaseMessage(TOPIC, "NO", "SpringKafkaApplicationTest"));
+
+        BaseMessage message = BaseMessage.builder()
+                .topic(TOPIC)
+                .message("NO")
+                .origin("SpringKafkaApplicationTest")
+                .customerId("0")
+                .build();
+        producer.send(TOPIC, message);
 
         consumer.getLatch().await(10000, TimeUnit.MILLISECONDS);
         Assertions.assertThat(consumer.getLatch().getCount()).isEqualTo(0);

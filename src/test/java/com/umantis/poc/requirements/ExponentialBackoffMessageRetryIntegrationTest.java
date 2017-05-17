@@ -49,8 +49,21 @@ public class ExponentialBackoffMessageRetryIntegrationTest {
     public void given_messageThatHasToBeReprocessed_when_errorAppears_then_ConsumerProcessesItAgain() throws InterruptedException {
 
         //given
-        producer.send(TOPIC, new BaseMessage(TOPIC, "This message will be correctly processed", "ExponentialBackoffMessageRetryIntegrationTest"));
-        producer.send(TOPIC, new BaseMessage(TOPIC, "This message will NOT be correctly processed", "ExponentialBackoffMessageRetryIntegrationTest"));
+        BaseMessage correctMessage = BaseMessage.builder()
+                .topic(TOPIC)
+                .message("This message will be correctly processed")
+                .origin("ExponentialBackoffMessageRetryIntegrationTest")
+                .customerId("0")
+                .build();
+        producer.send(TOPIC, correctMessage);
+
+        BaseMessage incorrectMessage = BaseMessage.builder()
+                .topic(TOPIC)
+                .message("This message will NOT be correctly processed")
+                .origin("ExponentialBackoffMessageRetryIntegrationTest")
+                .customerId("0")
+                .build();
+        producer.send(TOPIC, incorrectMessage);
 
         //when
         consumer.getIncorrectMessageLatch().await(10000, TimeUnit.MILLISECONDS);
