@@ -1,11 +1,11 @@
 package com.umantis.poc;
 
 import com.umantis.poc.exponentialbackoff.RandomException;
+import com.umantis.poc.model.BaseMessage;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AcknowledgingMessageListener;
 import org.springframework.kafka.listener.ConsumerSeekAware;
@@ -18,7 +18,7 @@ import java.util.concurrent.CountDownLatch;
  *
  * @author David Espinosa.
  */
-public class Consumer implements AcknowledgingMessageListener<Integer, String>, ConsumerSeekAware {
+public class Consumer implements AcknowledgingMessageListener<Integer, BaseMessage>, ConsumerSeekAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Consumer.class);
 
@@ -43,18 +43,18 @@ public class Consumer implements AcknowledgingMessageListener<Integer, String>, 
     }
 
     @KafkaListener(id = "consumer", topics = "${kafka.topic}")
-    public void receive(String message) {
+    public void receive(BaseMessage message) {
         LOGGER.info("received message= "+message);
         correctMessageLatch.countDown();
     }
 
     @Override
     @KafkaListener(id = "seeker", topics = "${kafka.seeker_topic}")
-    public void onMessage(final ConsumerRecord<Integer, String> consumerRecord, final Acknowledgment acknowledgment) {
+    public void onMessage(final ConsumerRecord<Integer, BaseMessage> consumerRecord, final Acknowledgment acknowledgment) {
 
         try {
-            String value = (String) consumerRecord.value();
-            if (value.contains("NOT")) {
+            BaseMessage value = (BaseMessage) consumerRecord.value();
+            if (value.getManufacturer().contains("NOT")) {
                 boolean emulateError = (incorrectMessageLatch.getCount() == 2);
                 incorrectMessageLatch.countDown();
                 if (emulateError) {

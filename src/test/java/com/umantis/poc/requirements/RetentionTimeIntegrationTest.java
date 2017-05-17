@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import com.umantis.poc.Producer;
 import com.umantis.poc.admin.KafkaAdminUtils;
+import com.umantis.poc.model.BaseMessage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +58,7 @@ public class RetentionTimeIntegrationTest {
     public void given_topicWithNoDataRetentionTimeSet_when_settingNewTime_then_theChangeRemains() {
 
         //given
-        producer.send(NEW_TOPIC, "New topic " + NEW_TOPIC + " is created");
+        producer.send(NEW_TOPIC, new BaseMessage(NEW_TOPIC , "Topic " + NEW_TOPIC +" is created", "RetentionTimeIntegrationTest"));
         long topicRetentionTime = kafkaAdminService.getTopicRetentionTime(NEW_TOPIC);
         assertEquals(topicRetentionTime, -1);
 

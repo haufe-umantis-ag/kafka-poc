@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.umantis.poc.Consumer;
 import com.umantis.poc.Producer;
 import com.umantis.poc.admin.KafkaAdminUtils;
+import com.umantis.poc.model.BaseMessage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,8 +49,8 @@ public class ExponentialBackoffMessageRetryIntegrationTest {
     public void given_messageThatHasToBeReprocessed_when_errorAppears_then_ConsumerProcessesItAgain() throws InterruptedException {
 
         //given
-        producer.send(TOPIC, "This message will be correctly processed");
-        producer.send(TOPIC, "This message will NOT be correctly processed");
+        producer.send(TOPIC, new BaseMessage(TOPIC, "This message will be correctly processed", "ExponentialBackoffMessageRetryIntegrationTest"));
+        producer.send(TOPIC, new BaseMessage(TOPIC, "This message will NOT be correctly processed", "ExponentialBackoffMessageRetryIntegrationTest"));
 
         //when
         consumer.getIncorrectMessageLatch().await(10000, TimeUnit.MILLISECONDS);

@@ -1,6 +1,7 @@
 package com.umantis.poc;
 
 import com.umantis.poc.admin.KafkaAdminUtils;
+import com.umantis.poc.model.BaseMessage;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class SpringKafkaApplicationTest {
 
     @Test
     public void testReceive() throws Exception {
-        producer.send(TOPIC, "Hello kafka");
+        producer.send(TOPIC, new BaseMessage(TOPIC, "NO", "SpringKafkaApplicationTest"));
 
         consumer.getLatch().await(10000, TimeUnit.MILLISECONDS);
         Assertions.assertThat(consumer.getLatch().getCount()).isEqualTo(0);
