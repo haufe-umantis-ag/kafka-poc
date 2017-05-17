@@ -2,9 +2,9 @@ package com.umantis.poc.model;
 
 public class BaseMessage {
 
-  private String make;
-  private String manufacturer;
-  private String id;
+  private String topic;
+  private String message;
+  private String origin;
 
   public BaseMessage() {
     super();
@@ -12,39 +12,39 @@ public class BaseMessage {
 
   public BaseMessage(String topic, String message, String origin) {
     super();
-    this.make = topic;
-    this.manufacturer = message;
-    this.id = origin;
+    this.topic = topic;
+    this.message = message;
+    this.origin = origin;
   }
 
-  public String getMake() {
-    return make;
+  public String getTopic() {
+    return topic;
   }
 
-  public void setMake(String make) {
-    this.make = make;
+  public void setTopic(String topic) {
+    this.topic = topic;
   }
 
-  public String getManufacturer() {
-    return manufacturer;
-  }
-
-
-  public void setManufacturer(String manufacturer) {
-    this.manufacturer = manufacturer;
-  }
-
-  public String getId() {
-    return id;
+  public String getMessage() {
+    return message;
   }
 
 
-  public void setId(String id) {
-    this.id = id;
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  public String getOrigin() {
+    return origin;
+  }
+
+
+  public void setOrigin(String origin) {
+    this.origin = origin;
   }
 
   @Override
   public String toString() {
-    return "Car [topic=" + make + ", message=" + manufacturer + ", origin=" + id + "]";
+    return "Car [topic=" + topic + ", message=" + message + ", origin=" + origin + "]";
   }
 }

@@ -54,7 +54,7 @@ public class Consumer implements AcknowledgingMessageListener<Integer, BaseMessa
 
         try {
             BaseMessage value = (BaseMessage) consumerRecord.value();
-            if (value.getManufacturer().contains("NOT")) {
+            if (value.getMessage().contains("NOT")) {
                 boolean emulateError = (incorrectMessageLatch.getCount() == 2);
                 incorrectMessageLatch.countDown();
                 if (emulateError) {
