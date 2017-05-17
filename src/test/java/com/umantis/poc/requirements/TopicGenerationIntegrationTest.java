@@ -2,6 +2,7 @@ package com.umantis.poc.requirements;
 
 import com.umantis.poc.Producer;
 import com.umantis.poc.admin.KafkaAdminUtils;
+import com.umantis.poc.model.BaseMessage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +41,14 @@ public class TopicGenerationIntegrationTest {
         Assert.isTrue(!topicExists, "Topic " + TOPIC + " not existing");
 
         //when
-        producer.send(TOPIC, "New topic " + TOPIC + " is created");
+        BaseMessage message = BaseMessage.builder()
+                .topic(TOPIC)
+                .message("New topic " + TOPIC + " is created")
+                .origin("TopicGenerationIntegrationTest")
+                .customerId("0")
+                .build();
+        producer.send(TOPIC,message);
+//        producer.send(TOPIC, new BaseMessage(TOPIC, "New topic " + TOPIC + " is created", "TopicGenerationIntegrationTest"));
 
         //then
         topicExists = kafkaAdminService.topicExists(TOPIC);

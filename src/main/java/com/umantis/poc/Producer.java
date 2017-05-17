@@ -1,5 +1,6 @@
 package com.umantis.poc;
 
+import com.umantis.poc.model.BaseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +19,15 @@ public class Producer {
     public static final Logger LOGGER = LoggerFactory.getLogger(Producer.class);
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<String, BaseMessage> kafkaTemplate;
 
-    public void send(String topic, String message) {
-        ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, message);
+    public void send(String topic, BaseMessage message) {
+        ListenableFuture<SendResult<String, BaseMessage>> future = kafkaTemplate.send(topic, message);
 
-        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
+        future.addCallback(new ListenableFutureCallback<SendResult<String, BaseMessage>>() {
 
             @Override
-            public void onSuccess(final SendResult<String, String> stringStringSendResult) {
+            public void onSuccess(final SendResult<String, BaseMessage> stringStringSendResult) {
                 LOGGER.info("sent message= " + message + " with offset= " + stringStringSendResult.getRecordMetadata().offset());
             }
 
