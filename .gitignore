@@ -3,3 +3,5 @@
 kafka-poc.iml
 lib/
 target/
+/.classpath
+/.project
