@@ -1,16 +1,16 @@
 package com.umantis.poc;
 
-import com.umantis.poc.admin.KafkaAdminUtils;
-import com.umantis.poc.model.BaseMessage;
+import java.util.concurrent.TimeUnit;
+
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import java.util.concurrent.TimeUnit;
+
+import com.umantis.poc.model.BaseMessage;
 
 /**
  * @author David Espinosa.
@@ -25,33 +25,20 @@ public class SpringKafkaApplicationTest {
     @Autowired
     public Consumer consumer;
 
-    @Autowired
-    public KafkaAdminUtils kafkaAdminService;
-
-    private static String TOPIC;
-
-    @Value("${kafka.topic}")
-    public void setTopic(String topic) {
-        TOPIC = topic;
-    }
-
-    @Before
-    public void setup() {
-        if (!kafkaAdminService.topicExists(TOPIC)) {
-            kafkaAdminService.createTopic(TOPIC, -1);
-        }
-    }
+	@Autowired
+	@Qualifier("kafkaTopicRandom")
+	String topic;
 
     @Test
-    public void testReceive() throws Exception {
+	public void testReceive() throws Exception {
 
         BaseMessage message = BaseMessage.builder()
-                .topic(TOPIC)
+				.topic(topic)
                 .message("NO")
                 .origin("SpringKafkaApplicationTest")
                 .customerId("0")
                 .build();
-        producer.send(TOPIC, message);
+		producer.send(topic, message);
 
         consumer.getLatch().await(10000, TimeUnit.MILLISECONDS);
         Assertions.assertThat(consumer.getLatch().getCount()).isEqualTo(0);

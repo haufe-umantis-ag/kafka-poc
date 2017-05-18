@@ -1,9 +1,12 @@
 package com.umantis.poc.config;
 
-import com.umantis.poc.Consumer;
-import com.umantis.poc.model.BaseMessage;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +16,9 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import java.util.HashMap;
-import java.util.Map;
+
+import com.umantis.poc.Consumer;
+import com.umantis.poc.model.BaseMessage;
 
 /**
  * Kafka Producer Configuration with special setup for exponential backoff message retry consumer.
@@ -25,6 +29,8 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class KafkaConsumerConfig {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
 
     @Value("${kafka.servers}")
     private String servers;
@@ -59,6 +65,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public Consumer consumer() {
+		LOGGER.info("Creating consumer");
         return new Consumer();
     }
 }

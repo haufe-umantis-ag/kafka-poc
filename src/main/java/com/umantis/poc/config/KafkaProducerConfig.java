@@ -1,10 +1,12 @@
 package com.umantis.poc.config;
 
-import com.umantis.poc.Producer;
-import com.umantis.poc.model.BaseMessage;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +15,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import java.util.HashMap;
-import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.umantis.poc.Producer;
+import com.umantis.poc.model.BaseMessage;
 
 /**
  * Basic Kafka configuration for producer.
@@ -23,6 +27,8 @@ import java.util.Map;
  */
 @Configuration
 public class KafkaProducerConfig {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducerConfig.class);
 
     @Value("${kafka.servers}")
     private String servers;
@@ -50,6 +56,7 @@ public class KafkaProducerConfig {
 
     @Bean
     public Producer producer() {
+		LOGGER.info("Creating producer");
         return new Producer();
     }
 }
