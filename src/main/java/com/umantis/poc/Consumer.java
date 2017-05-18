@@ -1,7 +1,8 @@
 package com.umantis.poc;
 
-import com.umantis.poc.exponentialbackoff.RandomException;
-import com.umantis.poc.model.BaseMessage;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
@@ -10,8 +11,9 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AcknowledgingMessageListener;
 import org.springframework.kafka.listener.ConsumerSeekAware;
 import org.springframework.kafka.support.Acknowledgment;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+
+import com.umantis.poc.exponentialbackoff.RandomException;
+import com.umantis.poc.model.BaseMessage;
 
 /**
  * Consumer implementation for exponential backoff message retry
@@ -42,14 +44,8 @@ public class Consumer implements AcknowledgingMessageListener<String, BaseMessag
 
     }
 
-    @KafkaListener(id = "consumer", topics = "${kafka.topic}")
-    public void receive(BaseMessage message) {
-        LOGGER.info("received message= "+message);
-        correctMessageLatch.countDown();
-    }
-
     @Override
-    @KafkaListener(id = "seeker", topics = "${kafka.seeker_topic}")
+	@KafkaListener(id = "seeker", topics = "#{kafkaTopicRandom}")
     public void onMessage(final ConsumerRecord<String, BaseMessage> consumerRecord, final Acknowledgment acknowledgment) {
 
         try {
@@ -63,6 +59,7 @@ public class Consumer implements AcknowledgingMessageListener<String, BaseMessag
             } else {
                 acknowledgment.acknowledge();
                 correctMessageLatch.countDown();
+				LOGGER.info("Received mssage {} from topic {}", value, consumerRecord.topic());
             }
         } catch (RandomException e) {
             consumerSeekCallback.seek(consumerRecord.topic(), consumerRecord.partition(), consumerRecord.offset());
