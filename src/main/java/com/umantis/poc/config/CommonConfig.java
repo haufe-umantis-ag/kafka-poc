@@ -18,10 +18,6 @@ public class CommonConfig {
 	@Autowired
 	public KafkaAdminUtils kafkaAdminService;
 
-	public CommonConfig() {
-
-	}
-
 	@Bean("kafkaTopicRandom")
 	public String kafkaTopicRandom(@Value("${kafka.topic}") String topic) {
 		String kafkaTopicRandom = topic + "." + RandomStringUtils.randomAlphabetic(8);
