@@ -2,10 +2,8 @@ package com.umantis.poc.requirements;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.umantis.poc.Consumer;
-import com.umantis.poc.Producer;
-import com.umantis.poc.admin.KafkaAdminUtils;
-import com.umantis.poc.model.BaseMessage;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import java.util.concurrent.TimeUnit;
+
+import com.umantis.poc.Consumer;
+import com.umantis.poc.Producer;
+import com.umantis.poc.admin.KafkaAdminUtils;
+import com.umantis.poc.model.BaseMessage;
 
 /**
  * @author David Espinosa.
@@ -33,7 +35,7 @@ public class ExponentialBackoffMessageRetryIntegrationTest {
 
     private static String TOPIC;
 
-    @Value("${kafka.seeker_topic}")
+	@Value("#{kafkaTopicRandom}")
     public void setTopic(String topic) {
         TOPIC = topic;
     }
