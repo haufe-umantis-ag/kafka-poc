@@ -18,10 +18,14 @@ public class CommonConfig {
 	@Autowired
 	public KafkaAdminUtils kafkaAdminService;
 
+	public CommonConfig() {
+
+	}
+
 	@Bean("kafkaTopicRandom")
 	public String kafkaTopicRandom(@Value("${kafka.topic}") String topic) {
 		String kafkaTopicRandom = topic + "." + RandomStringUtils.randomAlphabetic(8);
-		LOGGER.debug("Random topic name is {}", kafkaTopicRandom);
+		LOGGER.info("Random topic name is {}", kafkaTopicRandom);
 		if (!kafkaAdminService.topicExists(kafkaTopicRandom)) {
 			kafkaAdminService.createTopic(kafkaTopicRandom, -1);
 			LOGGER.info("Created topic {}", kafkaTopicRandom);
