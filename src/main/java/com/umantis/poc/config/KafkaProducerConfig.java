@@ -36,11 +36,9 @@ public class KafkaProducerConfig {
     @Bean
     public Map<String,Object> producerConfigs() {
         Map<String,Object> props = new HashMap<>();
-
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-
         return props;
     }
 

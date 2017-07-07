@@ -1,23 +1,18 @@
-package com.umantis.poc;
+package com.umantis.poc.requirements;
 
-import java.util.concurrent.TimeUnit;
-
+import com.umantis.poc.BaseTest;
+import com.umantis.poc.Consumer;
+import com.umantis.poc.Producer;
+import com.umantis.poc.model.BaseMessage;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import com.umantis.poc.model.BaseMessage;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author David Espinosa.
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class SpringKafkaApplicationTest {
+public class StandardMessagingTest extends BaseTest {
 
     @Autowired
     public Producer producer;
@@ -25,20 +20,16 @@ public class SpringKafkaApplicationTest {
     @Autowired
     public Consumer consumer;
 
-	@Autowired
-	@Qualifier("kafkaTopicRandom")
-	String topic;
-
     @Test
-	public void testReceive() throws Exception {
+    public void testReceive() throws Exception {
 
         BaseMessage message = BaseMessage.builder()
-				.topic(topic)
+                .topic(TOPIC)
                 .message("NO")
                 .origin("SpringKafkaApplicationTest")
                 .customerId("0")
                 .build();
-		producer.send(topic, message);
+        producer.send(TOPIC, message);
 
         consumer.getLatch().await(10000, TimeUnit.MILLISECONDS);
         Assertions.assertThat(consumer.getLatch().getCount()).isEqualTo(0);

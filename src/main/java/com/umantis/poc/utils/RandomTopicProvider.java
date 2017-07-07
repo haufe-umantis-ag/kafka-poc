@@ -1,4 +1,4 @@
-package com.umantis.poc.config;
+package com.umantis.poc.utils;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import com.umantis.poc.admin.KafkaAdminUtils;
 
 @Configuration
-public class CommonConfig {
+public class RandomTopicProvider {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(CommonConfig.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RandomTopicProvider.class);
 
 	@Autowired
 	public KafkaAdminUtils kafkaAdminService;

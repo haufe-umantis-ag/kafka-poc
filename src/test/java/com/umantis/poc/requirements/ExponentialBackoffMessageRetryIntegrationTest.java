@@ -2,50 +2,24 @@ package com.umantis.poc.requirements;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
+import com.umantis.poc.BaseTest;
 import com.umantis.poc.Consumer;
 import com.umantis.poc.Producer;
-import com.umantis.poc.admin.KafkaAdminUtils;
 import com.umantis.poc.model.BaseMessage;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author David Espinosa.
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ExponentialBackoffMessageRetryIntegrationTest {
-
-    @Autowired
-    public KafkaAdminUtils kafkaAdminService;
+public class ExponentialBackoffMessageRetryIntegrationTest extends BaseTest {
 
     @Autowired
     public Producer producer;
 
     @Autowired
     public Consumer consumer;
-
-    private static String TOPIC;
-
-	@Value("#{kafkaTopicRandom}")
-    public void setTopic(String topic) {
-        TOPIC = topic;
-    }
-
-    @Before
-    public void setup() {
-        if (!kafkaAdminService.topicExists(TOPIC)) {
-            kafkaAdminService.createTopic(TOPIC, -1);
-        }
-    }
 
     @Test()
     public void given_messageThatHasToBeReprocessed_when_errorAppears_then_ConsumerProcessesItAgain() throws InterruptedException {
