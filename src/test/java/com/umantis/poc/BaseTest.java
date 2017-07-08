@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public abstract class BaseTest {
 
     protected static String TOPIC;
+    protected static String GENERIC_TOPIC;
 
     protected static KafkaAdminUtils kafkaAdminService;
 
@@ -31,10 +32,24 @@ public abstract class BaseTest {
         TOPIC = topic;
     }
 
+    @Autowired
+    @Qualifier("kafkaTopicRandomGeneric")
+    public void setTopicGeneric(String topic) {
+        GENERIC_TOPIC = topic;
+    }
+
+    // application kafka listeners will thrown an error as they will loose synchronicity with the deleted topics
+    // as expected after this tearDown is executed
+    // an global application ExceptionHandler could be used to avoid those verbose exception messages
     @AfterClass
     public static void tearDown() {
         try {
             kafkaAdminService.markTopicForDeletion(TOPIC);
+        } catch (TopicAlreadyMarkedForDeletionException e) {
+        }
+
+        try {
+            kafkaAdminService.markTopicForDeletion(GENERIC_TOPIC);
         } catch (TopicAlreadyMarkedForDeletionException e) {
         }
     }

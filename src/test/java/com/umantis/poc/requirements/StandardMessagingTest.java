@@ -3,7 +3,7 @@ package com.umantis.poc.requirements;
 import com.umantis.poc.BaseTest;
 import com.umantis.poc.Consumer;
 import com.umantis.poc.Producer;
-import com.umantis.poc.model.BaseMessage;
+import com.umantis.poc.model.CommonMessage;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class StandardMessagingTest extends BaseTest {
     @Test
     public void testReceive() throws Exception {
 
-        BaseMessage message = BaseMessage.builder()
+        CommonMessage message = CommonMessage.builder()
                 .topic(TOPIC)
                 .message("NO")
                 .origin("SpringKafkaApplicationTest")
