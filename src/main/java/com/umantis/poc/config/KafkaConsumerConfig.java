@@ -1,8 +1,9 @@
 package com.umantis.poc.config;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.umantis.poc.Consumer;
+import com.umantis.poc.GenericConsumer;
+import com.umantis.poc.model.CommonMessage;
+import com.umantis.poc.model.GenericMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -17,9 +18,8 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-
-import com.umantis.poc.Consumer;
-import com.umantis.poc.model.BaseMessage;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Kafka Producer Configuration with special setup for exponential backoff message retry consumer.
@@ -32,13 +32,16 @@ import com.umantis.poc.model.BaseMessage;
 @DependsOn("kafkaTopicRandom")
 public class KafkaConsumerConfig {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumerConfig.class);
 
     @Value("${kafka.servers}")
     private String servers;
 
-    @Value("${consumer.grouip}")
+    @Value("${consumer.group}")
     private String groupId;
+
+    @Value("${generic.consumer.group}")
+    private String genericGroupId;
 
     @Bean
     public Map<String, Object> consumerConfigs() {
@@ -53,13 +56,13 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, BaseMessage> factoryConfig() {
-        return new DefaultKafkaConsumerFactory<String, BaseMessage>(consumerConfigs(), new StringDeserializer(), new JsonDeserializer(BaseMessage.class));
+    public ConsumerFactory<String, CommonMessage> factoryConfig() {
+        return new DefaultKafkaConsumerFactory<String, CommonMessage>(consumerConfigs(), new StringDeserializer(), new JsonDeserializer(CommonMessage.class));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, BaseMessage> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, BaseMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, CommonMessage> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, CommonMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(factoryConfig());
         factory.getContainerProperties().setAckMode(AbstractMessageListenerContainer.AckMode.MANUAL);
         return factory;
@@ -67,7 +70,37 @@ public class KafkaConsumerConfig {
 
     @Bean
     public Consumer consumer() {
-		LOGGER.info("Creating consumer");
+        LOGGER.info("Creating consumer");
         return new Consumer();
+    }
+
+    // up here common configuration, below a new one using GenericMessage type
+    @Bean
+    public Map<String, Object> genericConsumerConfigs() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        //Create a custom JsonDeserializer for generic types?
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, genericGroupId);
+        return props;
+    }
+
+    @Bean
+    public <T> ConsumerFactory<String, GenericMessage<T>> genericConsumerConsumerFactoryConfig() {
+        return new DefaultKafkaConsumerFactory<String, GenericMessage<T>>(genericConsumerConfigs(), new StringDeserializer(), new JsonDeserializer(GenericMessage.class));
+    }
+
+    @Bean
+    public <T> ConcurrentKafkaListenerContainerFactory<String, GenericMessage<T>> genericKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, GenericMessage<T>> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(genericConsumerConsumerFactoryConfig());
+        return factory;
+    }
+
+    @Bean
+    public GenericConsumer genericConsumer() {
+        LOGGER.info("Creating generic consumer");
+        return new GenericConsumer();
     }
 }

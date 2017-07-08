@@ -5,7 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import com.umantis.poc.BaseTest;
 import com.umantis.poc.Producer;
-import com.umantis.poc.model.BaseMessage;
+import com.umantis.poc.model.CommonMessage;
 import kafka.common.TopicAlreadyMarkedForDeletionException;
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class RetentionTimeIntegrationTest extends BaseTest {
     public void given_topicWithNoDataRetentionTimeSet_when_settingNewTime_then_theChangeRemains() {
 
         //given
-        BaseMessage message = BaseMessage.builder()
+        CommonMessage message = CommonMessage.builder()
                 .topic(NEW_TOPIC)
                 .message("New topic " + NEW_TOPIC + " is created")
                 .origin("RetentionTimeIntegrationTest")

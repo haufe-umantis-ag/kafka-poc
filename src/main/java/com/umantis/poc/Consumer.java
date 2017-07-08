@@ -1,7 +1,7 @@
 package com.umantis.poc;
 
 import com.umantis.poc.exponentialbackoff.RandomException;
-import com.umantis.poc.model.BaseMessage;
+import com.umantis.poc.model.CommonMessage;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import java.util.concurrent.CountDownLatch;
  *
  * @author David Espinosa.
  */
-public class Consumer implements AcknowledgingMessageListener<String, BaseMessage>, ConsumerSeekAware {
+public class Consumer implements AcknowledgingMessageListener<String, CommonMessage>, ConsumerSeekAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Consumer.class);
 
@@ -47,11 +47,11 @@ public class Consumer implements AcknowledgingMessageListener<String, BaseMessag
     }
 
     @Override
-    @KafkaListener(id = "my_id", topics = "#{kafkaTopicRandom}")
-    public void onMessage(final ConsumerRecord<String, BaseMessage> consumerRecord, final Acknowledgment acknowledgment) {
+    @KafkaListener(id = "id1", topics = "#{kafkaTopicRandom}")
+    public void onMessage(final ConsumerRecord<String, CommonMessage> consumerRecord, final Acknowledgment acknowledgment) {
 
         try {
-            BaseMessage value = (BaseMessage) consumerRecord.value();
+            CommonMessage value = (CommonMessage) consumerRecord.value();
             LOGGER.info("Received message {} from topic {}", value, consumerRecord.topic());
             if (value.getMessage().contains("NOT")) {
                 boolean emulateError = (incorrectMessageLatch.getCount() == 2);

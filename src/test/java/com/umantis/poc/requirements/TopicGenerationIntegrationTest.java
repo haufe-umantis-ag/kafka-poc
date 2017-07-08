@@ -2,7 +2,7 @@ package com.umantis.poc.requirements;
 
 import com.umantis.poc.BaseTest;
 import com.umantis.poc.Producer;
-import com.umantis.poc.model.BaseMessage;
+import com.umantis.poc.model.CommonMessage;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class TopicGenerationIntegrationTest extends BaseTest {
         Assert.isTrue(!topicExists, "Topic " + TOPIC + " not existing");
 
         //when
-        BaseMessage message = BaseMessage.builder()
+        CommonMessage message = CommonMessage.builder()
                 .topic(NON_EXISTING_TOPIC)
                 .message("New topic " + NON_EXISTING_TOPIC + " is created")
                 .origin("TopicGenerationIntegrationTest")
