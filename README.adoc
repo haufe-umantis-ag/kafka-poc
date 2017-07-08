@@ -40,3 +40,9 @@ The Kafka frameworks provide an Admin utils library which we can use to create, 
 
 In order to check the capability of kafka to manage the retention time of the messages in a topic, please execute test:
 `RetentionTimeIntegrationTest`
+
+=== Custom message headers creation
+In order to be able to simulate a header section, this test uses a message type that creates a headers section
+This is a temporary solution until spring implements native kafka custom headers creation
+In order to check it, please execute
+`HeadersMessagingTest`
