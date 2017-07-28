@@ -43,8 +43,8 @@ public class Producer {
         });
     }
 
-    public <T> void sendGeneric(String topic, GenericMessage<T> message) {
-        ListenableFuture<SendResult<String, GenericMessage>> future = genericKafkaTemplate.send(topic, message);
+    public void sendGeneric(String topic, GenericMessage message) {
+        ListenableFuture<SendResult<String, GenericMessage>> future = genericKafkaTemplate.send(topic, message.getResourceId(), message);
         future.addCallback(new ListenableFutureCallback<SendResult<String, GenericMessage>>() {
 
             @Override
