@@ -1,48 +1,72 @@
 package com.umantis.poc.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author David Espinosa.
  */
-public class NotificationMessage {
+@Data
+@ToString
+@NoArgsConstructor
+public class NotificationMessage extends GenericMessage {
 
     private String url;
     private String action;
 
-    public NotificationMessage() {
-    }
-
-    public NotificationMessage(final String url, final String action) {
+    public NotificationMessage(final Map<String, Object> headers, final String resourceId, String url, String action) {
+        super(headers, resourceId);
         this.url = url;
         this.action = action;
     }
 
-    @Override
-    public String toString() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+    public static NotificationMessageBuilder builder() {
+        return new NotificationMessageBuilder();
+    }
+
+    public static class NotificationMessageBuilder implements GenericMessageBuilderInterface<NotificationMessageBuilder> {
+
+        private Map<String, Object> headers;
+        private String url;
+        private String action;
+        private String resourceId;
+
+        public NotificationMessageBuilder setUrl(final String url) {
+            this.url = url;
+            return this;
         }
-        return null;
-    }
 
-    public String getUrl() {
-        return url;
-    }
+        public NotificationMessageBuilder setAction(final String action) {
+            this.action = action;
+            return this;
+        }
 
-    public void setUrl(final String url) {
-        this.url = url;
-    }
+        @Override
+        public NotificationMessageBuilder setHeaders(final Map<String, Object> headers) {
+            this.headers = headers;
+            return this;
+        }
 
-    public String getAction() {
-        return action;
-    }
+        @Override
+        public NotificationMessageBuilder addHeader(final String key, final Object value) {
+            if (headers == null) {
+                headers = new HashMap<>();
+            }
+            headers.put(key, value);
+            return this;
+        }
 
-    public void setAction(final String action) {
-        this.action = action;
+        @Override
+        public NotificationMessageBuilder setResourceId(final String resourceId) {
+            this.resourceId = resourceId;
+            return this;
+        }
+
+        public NotificationMessage build() {
+            return new NotificationMessage(this.headers, this.resourceId, this.url, this.action);
+        }
     }
 }

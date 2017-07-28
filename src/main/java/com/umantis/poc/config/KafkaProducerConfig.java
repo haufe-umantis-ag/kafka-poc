@@ -36,8 +36,6 @@ public class KafkaProducerConfig {
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         return props;
     }
 
@@ -52,13 +50,13 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public <T> ProducerFactory<String, GenericMessage<T>> genericProducerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs(), new StringSerializer(), new JsonSerializer(new ObjectMapper()));
+    public ProducerFactory<String, GenericMessage> producerFactory(ObjectMapper objectMapper) {
+        return new DefaultKafkaProducerFactory<>(producerConfigs(), new StringSerializer(), new JsonSerializer(objectMapper));
     }
 
     @Bean
-    public <T> KafkaTemplate<String, GenericMessage<T>> genericKafkaTemplate() {
-        return new KafkaTemplate<String, GenericMessage<T>>(genericProducerFactory());
+    public KafkaTemplate<String, GenericMessage> genericKafkaTemplate(ObjectMapper objectMapper) {
+        return new KafkaTemplate<>(producerFactory(objectMapper));
     }
 
     @Bean

@@ -3,7 +3,7 @@ package com.umantis.poc.config;
 import com.umantis.poc.Consumer;
 import com.umantis.poc.GenericConsumer;
 import com.umantis.poc.model.CommonMessage;
-import com.umantis.poc.model.GenericMessage;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -17,6 +17,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
+import org.springframework.kafka.support.converter.MessagingMessageConverter;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +71,6 @@ public class KafkaConsumerConfig {
 
     @Bean
     public Consumer consumer() {
-        LOGGER.info("Creating consumer");
         return new Consumer();
     }
 
@@ -79,22 +79,22 @@ public class KafkaConsumerConfig {
     public Map<String, Object> genericConsumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, servers);
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        //Create a custom JsonDeserializer for generic types?
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, genericGroupId);
         return props;
     }
 
     @Bean
-    public <T> ConsumerFactory<String, GenericMessage<T>> genericConsumerConsumerFactoryConfig() {
-        return new DefaultKafkaConsumerFactory<String, GenericMessage<T>>(genericConsumerConfigs(), new StringDeserializer(), new JsonDeserializer(GenericMessage.class));
+    public ConsumerFactory<String, String> genericConsumerConsumerFactoryConfig() {
+        return new DefaultKafkaConsumerFactory<String, String>(genericConsumerConfigs(), new StringDeserializer(), new StringDeserializer());
     }
 
     @Bean
-    public <T> ConcurrentKafkaListenerContainerFactory<String, GenericMessage<T>> genericKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, GenericMessage<T>> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, String> genericKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(genericConsumerConsumerFactoryConfig());
+        // using this messageconverter, the object is correctly unmarshaled but keys and headers are not reachable
+        //        factory.setMessageConverter(new StringJsonMessageConverter());
+        factory.setMessageConverter(new MessagingMessageConverter());
         return factory;
     }
 
@@ -102,5 +102,10 @@ public class KafkaConsumerConfig {
     public GenericConsumer genericConsumer() {
         LOGGER.info("Creating generic consumer");
         return new GenericConsumer();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }
